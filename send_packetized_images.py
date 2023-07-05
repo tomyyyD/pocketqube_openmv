@@ -4,13 +4,14 @@ import os
 from pyb import UART
 
 # set up camera
-sensor.reset()                      # Reset and initialize the sensor.
-sensor.set_pixformat(sensor.RGB565) # Set pixel format to RGB565 (or GRAYSCALE)
-sensor.set_framesize(sensor.HD)     # Set frame size to HD (640 x 480)
-sensor.skip_frames(time = 2000)     # Wait for settings take effect.
+sensor.reset()                          # Reset and initialize the sensor.
+sensor.set_pixformat(sensor.RGB565)     # Set pixel format to RGB565 (or GRAYSCALE)
+sensor.set_framesize(sensor.HD)         # Set frame size to HD (640 x 480)
+sensor.skip_frames(time=2000)           # Wait for settings take effect.
 
 # UART 3, and baudrate.
 uart = UART(3, 115200)
+
 
 def handle_disk_send(filepath):
     # gets stat.ST_SIZE
@@ -51,10 +52,12 @@ def handle_disk_send(filepath):
                         time.sleep(0.3)
     return True
 
+
 def handle_memory_send(img):
     uart.write(img)
     s_time = time.time()
     buffer = bytearray(1)
+    confirmed = False
     while not confirmed:
         if time.time() - 20 > s_time:
             return False
@@ -64,15 +67,16 @@ def handle_memory_send(img):
                 confirmed = True
     return True
 
+
 try:
-    if not "images" in os.listdir():
+    if "images" not in os.listdir():
         os.mkdir("images")
 except Exception as e:
     print(f"could not create images directory: {e}")
 
 
 buffer = bytearray(1)
-while(True):
+while (True):
     if (uart.any()):
         uart.readinto(buffer)
         if (0x7A == buffer[0]):
