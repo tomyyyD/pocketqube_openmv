@@ -16,7 +16,7 @@ uart = UART(3, 115200)
 def handle_disk_send(filepath):
     # gets stat.ST_SIZE
     filesize = os.stat(filepath)[6]
-    packet_len = 5120
+    packet_len = 1000
     pointer = 0
     with open(filepath, "rb") as fd:
         while (pointer < filesize):
@@ -50,21 +50,6 @@ def handle_disk_send(filepath):
                     if buffer[0] == 0xAD:
                         confirmed = True
                         time.sleep(0.3)
-    return True
-
-
-def handle_memory_send(img):
-    uart.write(img)
-    s_time = time.time()
-    buffer = bytearray(1)
-    confirmed = False
-    while not confirmed:
-        if time.time() - 20 > s_time:
-            return False
-        if uart.any():
-            uart.readinto(buffer)
-            if buffer[0] == 0xAD:
-                confirmed = True
     return True
 
 
